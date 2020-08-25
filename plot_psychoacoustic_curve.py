@@ -7,6 +7,7 @@ import scipy
 import librosa
 from matplotlib import pyplot as plt
 masking=[0]*1025
+
 def compute_PSD_matrix(audio, window_size):
     """
 	First, perform STFT.
@@ -15,8 +16,6 @@ def compute_PSD_matrix(audio, window_size):
     """
 
     win = np.sqrt(8.0 / 3.) * librosa.core.stft(audio, center=False)
-    # print("librosa")
-    # print(len(librosa.core.stft(audio, center=False)))
     z = abs(win / window_size)
     psd_max = np.max(z * z)
     psd = 10 * np.log10(z * z + 0.0000000000000000001)
@@ -128,15 +127,9 @@ def compute_th(PSD, barks, ATH, freqs,freq_stft):
             m[i]=0
 
 
-    print("hi")
-    print(len(PSD[masker_index]))
-
 
     Ts = np.array(Ts)
 
-    #ax.plot(masker_index,P_TM.flatten()[0:num_local_max],'y--')
-    # print("Ts")
-    # print(len(Ts))
 
     # compute the global masking threshold
     theta_x = 10 * np.log10(np.sum(pow(10, Ts / 10.), axis=0) + pow(10, ATH / 10.))
@@ -162,50 +155,18 @@ def generate_th(audio, fs, window_size=2048):
 
     # compute the global masking threshold theta_xs
     theta_xs = []
-    # print("psdfunction")
-    # print(PSD.shape[1])
     # compute the global masking threshold in each window
     for i in range(PSD.shape[1]):
-        # print("psd ata a step")
-        # print(PSD[:, i])
-        # print(len(PSD[:, i]))
         theta_xs.append(compute_th(PSD[:, i], barks, ATH, freqs,freq_stft[:,i]))
-        # print("compute_th")
-        # print(PSD[:, i], barks, ATH, freqs)
-        # print(len(compute_th(PSD[:, i], barks, ATH, freqs)))
     theta_xs = np.array(theta_xs)
 
     t = m
-    #plt.plot(freqs,theta_xs[0],'b')
-    #plt.plot(freqs,ATH)
-#    plt.plot(freqs,masking+10*np.log10(pow(10, ATH / 10.)))
-
-    #plot=10 * np.log10(pow(10, ATH / 10.))
-    #plt.plot(freqs,TS[:,0],'b--')
-    #plt.plot(freqs,t+plot,".")
-
-
-    #plt.plot(freqs,PSD[:,0],'g--')
 
     rows,colms=theta_xs.shape[1],theta_xs.shape[0]
 
     arr=[[0]*rows]*colms
-    # for i in range(158):
-    #     for j in range(1025):
-    #         if(PSD[j][i]>=theta_xs[i][j]):
-    #             arr[i][j]=PSD[j][i]
-    #         else:
-    #             arr[i][j]=min(ATH)
-   # plt.plot(freqs, arr[0]+ATH)
-    #plt.show()
-    print("theta_xs")
-    print(len(theta_xs))
-    print(freq_stft)
     iStftMat = librosa.core.istft(freq_stft)
-
     scipy.io.wavfile.write("stft_freq_Out.wav", 16000, iStftMat)
-
-
     return theta_xs, psd_max
 
 
@@ -241,12 +202,6 @@ for i in range(1):
     audios_np[i, :lengths[i]] = audio_float
     masks[i, :lengths[i]] = 1
     masks_freq[i, :lengths_freq[i], :] = 1
-    print("audio")
-    print(len(audios_np[i]))
-
     # compute the masking threshold
     th, psd_max = generate_th(audios_np[i], sample_rate_np, 2048)
-    print("threshhold computation")
-    print(len(th))
-    print(th)
-    print("audio wave")
+   
