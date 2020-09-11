@@ -1,5 +1,5 @@
 # Targeted Adversarial attack on Audio
-This repository contains the code for attacking the deepspeech model by maintaing imperceptibility of audio on Mozilla Common Voice Dataset.
+This repository contains the code for attacking the DeepSpeech model by maintaining imperceptibility of audio on Mozilla Common Voice Dataset.
 
 # Requirements
 Python packages: numpy, tensorflow, librosa,scipy.
